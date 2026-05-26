@@ -1,0 +1,7 @@
+.env
+frontend/.env.local
+etl/venv/
+data/raw/
+data/processed/
+__pycache__/
+.DS_Store
