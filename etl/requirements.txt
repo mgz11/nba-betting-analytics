@@ -5,6 +5,7 @@ nba_api==1.11.4
 numpy==2.4.6
 pandas==3.0.3
 psycopg2-binary==2.9.12
+py-ball==1.42
 python-dateutil==2.9.0.post0
 python-dotenv==1.2.2
 requests==2.34.2

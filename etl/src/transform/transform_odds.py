@@ -18,22 +18,36 @@ def transform_odds(raw_games):
         moneyline_away = None
         total = None
 
-        bookmaker = game["bookmakers"][0] if game["bookmakers"] else None
+        # Skip games with no bookmakers
+        if not game["bookmakers"]:
+            continue
+
+        # Prioritize certain bookmakers for consistency
+        bookmaker_preferences = ["fanduel", "draftkings", "betmgm"]
+        bookmaker = None
+        for pref in bookmaker_preferences:
+            bookmaker = next((b for b in game["bookmakers"] if b["key"] == pref), None)
+            if bookmaker:
+                break
+
+        # If no preferred bookmaker found, take the first one
+        if not bookmaker and game["bookmakers"]:
+            bookmaker = game["bookmakers"][0]
 
         for market in bookmaker["markets"]:
-            if market["key"] == "spreads":
-                for outcome in market["outcomes"]:
-                    if outcome["name"] == home_team:
-                        spread_home = outcome["point"]
-                    elif outcome["name"] == away_team:
-                        spread_away = outcome["point"]
-
             if market["key"] == "h2h":
                 for outcome in market["outcomes"]:
                     if outcome["name"] == home_team:
                         moneyline_home = outcome["price"]
                     elif outcome["name"] == away_team:
                         moneyline_away = outcome["price"]
+            
+            if market["key"] == "spreads":
+                for outcome in market["outcomes"]:
+                    if outcome["name"] == home_team:
+                        spread_home = outcome["point"]
+                    elif outcome["name"] == away_team:
+                        spread_away = outcome["point"]
 
             if market["key"] == "totals":
                 total = market["outcomes"][0]["point"]
