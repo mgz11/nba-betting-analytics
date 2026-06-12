@@ -1,72 +1,27 @@
-import json
-from config.env import DATABASE_URL
-from config.settings import ODDS_RAW_DIR
-from src.ingest.fetch_odds_api import fetch_odds_from_api
-from src.ingest.fetch_scores_api import fetch_scores_from_api
-from src.ingest.load_local_odds import load_local_odds
-from src.transform.transform_odds import transform_odds
-from src.transform.transform_scores import transform_scores
-from src.transform.transform_team_game_features import transform_team_game_features
-from src.load.load_postgres import load_games
-from src.load.load_team_game_features import load_team_game_features
-from src.load.update_scores import update_scores
-from datetime import datetime
+import logging
+from src.pipelines.odds_pipeline import run_odds_pipeline
+from src.pipelines.scores_pipeline import run_scores_pipeline
+from src.pipelines.team_features_pipeline import run_team_features_pipeline
+
+logging.basicConfig(
+    level=logging.INFO,
+    format="%(asctime)s - %(levelname)s - %(name)s - %(message)s"
+)
+logger = logging.getLogger(__name__)
 
 def main():
-    # # Step 1: Fetch odds data from API
-    # print("Fetching odds data from API...")
-    # api_odds = fetch_odds_from_api()
-    # if not api_odds:
-    #     print("No odds data fetched from API.")
-    #     return
+    logger.info("Starting ETL process...")
+
+    # Run odds pipeline to fetch and load the latest odds data
+    # run_odds_pipeline()
     
-    # timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-    # raw_path = ODDS_RAW_DIR / f"odds_{timestamp}.json"
-
-    # # Step 2: Save raw API data locally
-    # print(f"Saving raw API data to {raw_path}...")
-    # raw_path.parent.mkdir(parents=True, exist_ok=True)
-
-    # with open(raw_path, "w") as f:
-    #     import json
-    #     json.dump(api_odds, f, indent=2)
-
-    # print(f"Saved {len(api_odds)} games to {raw_path}")
-
-    # '''
-    # TESTING TRANSFORMED ROWS
-    # '''
-    # with open(ODDS_RAW_DIR / "odds_20260609_142500.json") as f:
-    #     raw_odds = json.load(f) 
-    # transformed_rows = transform_odds(raw_odds)
-    # print(f"Transformed {len(transformed_rows)} games for loading.")
-    # print(transformed_rows)
-    # load_games(DATABASE_URL, transformed_rows)
-    # print("Data loaded into PostgreSQL successfully.")
-
-    # Step 3: Fetch scores data from API
-    # print("Fetching scores data from API...")
-    # api_scores = fetch_scores_from_api()
-    # if not api_scores:
-    #     print("No scores data fetched from API.")
-    #     return
-
-    # # Step 4: Transform scores data
-    # print("Transforming scores data...")
-    # transformed_scores = transform_scores(api_scores)
-
-    # # Step 5: Update scores in PostgreSQL
-    # print("Updating scores in PostgreSQL...")
-    # update_scores(DATABASE_URL, transformed_scores)
-    # print("Scores updated in PostgreSQL successfully.")
-
-    # Step 6 Load team game features
-    print("Transforming team game features...")
-    team_game_features = transform_team_game_features(DATABASE_URL)
-    print(f"Transformed {len(team_game_features)} team game feature rows.") 
-    print("Loading team game features into PostgreSQL...")
-    load_team_game_features(DATABASE_URL, team_game_features)
-    print("Team game features loaded into PostgreSQL successfully.")
+    # Run scores pipeline to fetch and update the latest scores in the database
+    # run_scores_pipeline()
+    
+    # Run team features pipeline to update features based on the latest scores
+    run_team_features_pipeline()
+    
+    logger.info("ETL process completed successfully.")
     
 
 if __name__ == "__main__":
