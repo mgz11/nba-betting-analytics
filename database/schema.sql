@@ -49,4 +49,5 @@ CREATE TABLE team_game_features (
     spread NUMERIC,
     covered_spread BOOLEAN,
     spread_diff NUMERIC
+    game_date DATE NOT NULL
 );
