@@ -1,6 +1,7 @@
 import logging
 from src.transform.transform_team_game_features import transform_team_game_features
 from src.load.load_team_game_features import load_team_game_features
+from src.validate.team_game_features import validate_team_game_features
 from config.env import DATABASE_URL
 
 logger = logging.getLogger(__name__)
@@ -15,3 +16,8 @@ def run_team_features_pipeline():
     logger.info("Loading team game features into PostgreSQL...")
     load_team_game_features(DATABASE_URL, team_game_features)
     logger.info("Team game features loaded into PostgreSQL successfully.")
+
+    # Step 3: Validate persisted team game features
+    logger.info("Validating team game features...")
+    validate_team_game_features(DATABASE_URL)
+    logger.info("Team game features validated successfully.")

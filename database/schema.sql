@@ -48,6 +48,8 @@ CREATE TABLE team_game_features (
     is_favorite BOOLEAN,
     spread NUMERIC,
     covered_spread BOOLEAN,
-    spread_diff NUMERIC
-    game_date DATE NOT NULL
+    spread_diff NUMERIC,
+    game_date DATE NOT NULL,
+
+    UNIQUE(game_id, team)
 );

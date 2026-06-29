@@ -1,4 +1,5 @@
 from sqlalchemy import create_engine, text
+from datetime import date, datetime
 
 WINDOW_SIZE = 5
 def transform_team_game_features(database_url):
@@ -16,7 +17,7 @@ def transform_team_game_features(database_url):
             spread_away
     FROM games
     WHERE home_score IS NOT NULL AND away_score IS NOT NULL
-    ORDER BY game_date
+    ORDER BY game_date, id
     """)
 
     with engine.connect() as connection:
@@ -33,10 +34,13 @@ def transform_team_game_features(database_url):
         spread_home = game["spread_home"]
         spread_away = game["spread_away"]
         home_favorite = spread_home is not None and spread_home < 0
-        home_covered = (home_score - away_score) + spread_home > 0
         home_spread_diff = (home_score - away_score) + spread_home if spread_home is not None else None
+        home_covered = home_spread_diff > 0 if home_spread_diff is not None else None
+        away_favorite = spread_away is not None and spread_away < 0
+        away_spread_diff = (away_score - home_score) + spread_away if spread_away is not None else None
+        away_covered = away_spread_diff > 0 if away_spread_diff is not None else None
 
-        # Calculate rolling statisctics for home team
+        # Calculate rolling statistics for home team
         previous_home_games = team_history.get(home_team, [])
         previous_away_games = team_history.get(away_team, [])
         home_rest, home_avg_margin, home_win_pct = calculate_rolling_stats(game["game_date"], previous_home_games)
@@ -73,10 +77,10 @@ def transform_team_game_features(database_url):
             "rest_days": away_rest,
             "recent_avg_margin": away_avg_margin,
             "recent_win_pct": away_win_pct,
-            "is_favorite": not home_favorite,
-            "covered_spread": not home_covered,
+            "is_favorite": away_favorite,
+            "covered_spread": away_covered,
             "spread": spread_away,
-            "spread_diff": -home_spread_diff,
+            "spread_diff": away_spread_diff,
             "game_date": game["game_date"]
         })
 
@@ -100,8 +104,20 @@ def transform_team_game_features(database_url):
 
 def calculate_rolling_stats(game_date, team_history):
     recent_games = team_history[-WINDOW_SIZE:] if team_history else []
-    rest_days = (game_date - team_history[-1]["game_date"]).days if team_history else None
+    rest_days = days_between(game_date, team_history[-1]["game_date"]) if team_history else None
     recent_avg_margin = (sum(g["point_diff"] for g in recent_games) / len(recent_games)) if recent_games else None
     recent_win_pct = (sum(1 for g in recent_games if g["win"]) / len(recent_games)) if recent_games else None
 
     return rest_days, recent_avg_margin, recent_win_pct
+
+
+def days_between(current_game_date, previous_game_date):
+    return (normalize_date(current_game_date) - normalize_date(previous_game_date)).days
+
+
+def normalize_date(value):
+    if isinstance(value, datetime):
+        return value.date()
+    if isinstance(value, date):
+        return value
+    return datetime.fromisoformat(value).date()

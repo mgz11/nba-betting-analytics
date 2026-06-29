@@ -18,7 +18,7 @@ def fetch_scores_from_api(sport: str = "basketball_wnba"):
     endpoint = f"{BASE_URL}/sports/{sport}/scores"
     params = {
         "apiKey": ODDS_API_KEY,
-        "daysFrom": 2
+        "daysFrom": 1
     }
 
     start = time.time()
