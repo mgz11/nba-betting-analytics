@@ -36,7 +36,7 @@ class TeamGameFeaturesValidationTest(unittest.TestCase):
                 "external_game_id": "game-1",
                 "game_date": date(2026, 1, 1),
                 "home_team": "Aces",
-                "away_team": "Bears",
+                "away_team": "Liberty",
                 "home_score": 90,
                 "away_score": 80,
                 "spread_home": -4.5,
@@ -46,7 +46,7 @@ class TeamGameFeaturesValidationTest(unittest.TestCase):
                 "id": 2,
                 "external_game_id": "game-2",
                 "game_date": date(2026, 1, 3),
-                "home_team": "Cats",
+                "home_team": "Mystic",
                 "away_team": "Aces",
                 "home_score": 70,
                 "away_score": 75,
@@ -57,8 +57,8 @@ class TeamGameFeaturesValidationTest(unittest.TestCase):
                 "id": 3,
                 "external_game_id": "game-3",
                 "game_date": date(2026, 1, 5),
-                "home_team": "Bears",
-                "away_team": "Cats",
+                "home_team": "Liberty",
+                "away_team": "Mystic",
                 "home_score": 88,
                 "away_score": 81,
                 "spread_home": 1.5,
@@ -86,20 +86,20 @@ class TeamGameFeaturesValidationTest(unittest.TestCase):
                 WHERE game_id = 2 AND team = 'Aces'
                 """)
             ).mappings().one()
-            cats_game_3 = connection.execute(
+            Mystic_game_3 = connection.execute(
                 text("""
                 SELECT rest_days, recent_avg_margin, recent_win_pct
                 FROM team_game_features
-                WHERE game_id = 3 AND team = 'Cats'
+                WHERE game_id = 3 AND team = 'Mystic'
                 """)
             ).mappings().one()
 
         self.assertEqual(aces_game_2["rest_days"], 2)
         self.assertEqual(float(aces_game_2["recent_avg_margin"]), 10.0)
         self.assertEqual(float(aces_game_2["recent_win_pct"]), 1.0)
-        self.assertEqual(cats_game_3["rest_days"], 2)
-        self.assertEqual(float(cats_game_3["recent_avg_margin"]), -5.0)
-        self.assertEqual(float(cats_game_3["recent_win_pct"]), 0.0)
+        self.assertEqual(Mystic_game_3["rest_days"], 2)
+        self.assertEqual(float(Mystic_game_3["recent_avg_margin"]), -5.0)
+        self.assertEqual(float(Mystic_game_3["recent_win_pct"]), 0.0)
 
     def test_row_count_validation_fails_when_completed_game_has_one_team_row(self):
         self._insert_games([
@@ -108,7 +108,7 @@ class TeamGameFeaturesValidationTest(unittest.TestCase):
                 "external_game_id": "game-1",
                 "game_date": date(2026, 1, 1),
                 "home_team": "Aces",
-                "away_team": "Bears",
+                "away_team": "Liberty",
                 "home_score": 90,
                 "away_score": 80,
                 "spread_home": -4.5,
@@ -118,7 +118,7 @@ class TeamGameFeaturesValidationTest(unittest.TestCase):
         self._insert_feature_row(
             game_id=1,
             team="Aces",
-            opponent_team="Bears",
+            opponent_team="Liberty",
             is_home=True,
             team_score=90,
             opponent_score=80,
@@ -136,7 +136,7 @@ class TeamGameFeaturesValidationTest(unittest.TestCase):
                 "external_game_id": "game-1",
                 "game_date": date(2026, 1, 1),
                 "home_team": "Aces",
-                "away_team": "Bears",
+                "away_team": "Liberty",
                 "home_score": 90,
                 "away_score": 80,
                 "spread_home": -4.5,
@@ -147,7 +147,7 @@ class TeamGameFeaturesValidationTest(unittest.TestCase):
                 "external_game_id": "game-2",
                 "game_date": date(2026, 1, 3),
                 "home_team": "Aces",
-                "away_team": "Bears",
+                "away_team": "Liberty",
                 "home_score": 82,
                 "away_score": 84,
                 "spread_home": -2.5,

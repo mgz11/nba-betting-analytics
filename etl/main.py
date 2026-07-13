@@ -16,7 +16,7 @@ def main():
     # run_odds_pipeline()
     
     # Run scores pipeline to fetch and update the latest scores in the database
-    # run_scores_pipeline()
+    run_scores_pipeline()
     
     # Run team features pipeline to update features based on the latest scores
     run_team_features_pipeline()
