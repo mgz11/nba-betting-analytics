@@ -13,7 +13,7 @@ def main():
     logger.info("Starting ETL process...")
 
     # Run odds pipeline to fetch and load the latest odds data
-    # run_odds_pipeline()
+    run_odds_pipeline()
     
     # Run scores pipeline to fetch and update the latest scores in the database
     run_scores_pipeline()
